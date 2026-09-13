@@ -11,7 +11,9 @@ app.use(
     origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
   }),
 );
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/health", async (_req, res) => {
   const { error } = await supabase
