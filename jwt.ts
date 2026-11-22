@@ -15,11 +15,13 @@ function getJwtSecret(): string {
   return secret;
 }
 
-export function signAuthToken(user: {
+export type AuthUser = {
   id: number;
   user_id: string;
   user_role: number;
-}): string {
+};
+
+export function signAuthToken(user: AuthUser): string {
   return jwt.sign(
     {
       user_id: user.user_id,
@@ -31,4 +33,26 @@ export function signAuthToken(user: {
       expiresIn: "7d",
     },
   );
+}
+
+export function verifyAuthToken(token: string): AuthUser {
+  const payload = jwt.verify(token, getJwtSecret());
+
+  if (typeof payload === "string") {
+    throw new Error("invalid token");
+  }
+
+  const id = Number(payload.sub);
+  const user_id = payload.user_id;
+  const user_role = payload.user_role;
+
+  if (
+    !Number.isFinite(id) ||
+    typeof user_id !== "string" ||
+    typeof user_role !== "number"
+  ) {
+    throw new Error("invalid token");
+  }
+
+  return { id, user_id, user_role };
 }

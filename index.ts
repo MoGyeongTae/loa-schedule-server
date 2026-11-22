@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 import { signAuthToken } from "./jwt";
 import { verifyPassword } from "./password";
+import { requireAuth } from "./requireAuth";
 import { supabase } from "./supabase";
 
 const app = express();
@@ -16,6 +17,7 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(requireAuth);
 
 app.get("/health", async (_req, res) => {
   const { error } = await supabase
