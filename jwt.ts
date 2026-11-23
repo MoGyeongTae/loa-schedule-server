@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 export type AuthTokenPayload = {
   user_id: string;
   user_role: number;
+  display_name: string;
 };
 
 function getJwtSecret(): string {
@@ -19,6 +20,7 @@ export type AuthUser = {
   id: number;
   user_id: string;
   user_role: number;
+  display_name: string;
 };
 
 export function signAuthToken(user: AuthUser): string {
@@ -26,6 +28,7 @@ export function signAuthToken(user: AuthUser): string {
     {
       user_id: user.user_id,
       user_role: user.user_role,
+      display_name: user.display_name,
     } satisfies AuthTokenPayload,
     getJwtSecret(),
     {
@@ -45,14 +48,17 @@ export function verifyAuthToken(token: string): AuthUser {
   const id = Number(payload.sub);
   const user_id = payload.user_id;
   const user_role = payload.user_role;
+  const display_name = payload.display_name;
 
   if (
     !Number.isFinite(id) ||
     typeof user_id !== "string" ||
-    typeof user_role !== "number"
+    typeof user_role !== "number" ||
+    typeof display_name !== "string" ||
+    display_name.trim() === ""
   ) {
     throw new Error("invalid token");
   }
 
-  return { id, user_id, user_role };
+  return { id, user_id, user_role, display_name: display_name.trim() };
 }

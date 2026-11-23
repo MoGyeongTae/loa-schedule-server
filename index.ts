@@ -105,30 +105,20 @@ app.get("/schedule-events", async (req, res) => {
 // POST /schedule-events
 
 app.post("/schedule-events", async (req, res) => {
-  const {
-    name,
-    start_time,
-    end_time,
-    week_days,
-    event_options,
-    event_date,
-    user_name,
-  } = req.body ?? {};
+  const { name, start_time, end_time, week_days, event_options, event_date } =
+    req.body ?? {};
 
   if (typeof name !== "string" || name.trim() === "") {
     res.status(400).json({ error: "name is required" });
     return;
   }
 
-  if (typeof user_name !== "string" || user_name.trim() === "") {
-    res.status(400).json({ error: "user_name is required" });
+  if (!req.user) {
+    res.status(401).json({ error: "로그인이 필요합니다." });
     return;
   }
 
-  if (user_name.length > 30) {
-    res.status(400).json({ error: "user_name must be 30 characters or less" });
-    return;
-  }
+  const user_name = req.user.display_name;
 
   const { data, error } = await supabase
     .from("schedule_events")
@@ -173,7 +163,7 @@ app.post("/login", async (req, res) => {
 
   const { data: user, error } = await supabase
     .from("users")
-    .select("id, user_id, user_role, password_hash")
+    .select("id, user_id, user_role, display_name, password_hash")
     .eq("user_id", user_id.trim())
     .maybeSingle();
 
@@ -191,10 +181,16 @@ app.post("/login", async (req, res) => {
     return;
   }
 
+  if (typeof user.display_name !== "string" || user.display_name.trim() === "") {
+    res.status(500).json({ error: "사용자 이름을 확인할 수 없습니다." });
+    return;
+  }
+
   const token = signAuthToken({
     id: user.id,
     user_id: user.user_id,
     user_role: user.user_role,
+    display_name: user.display_name.trim(),
   });
 
   res.status(200).json({ message: "로그인 성공", token });
