@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { hashPassword } from "./password";
-import { supabase } from "./supabase";
+import { supabase } from "../../supabase";
 
 const USER_ID_PATTERN = /^[a-zA-Z0-9._-]{3,30}$/;
 

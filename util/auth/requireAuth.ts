@@ -15,13 +15,15 @@ export const requireAuth: RequestHandler = (req, res, next) => {
     return;
   }
 
-  if (req.method === "POST" && req.path === "/login") {
+  if (req.method === "POST" && req.path === "/api/auth/login") {
     next();
     return;
   }
 
   const header = req.headers.authorization;
-  const token = header?.startsWith("Bearer ") ? header.slice("Bearer ".length) : "";
+  const token = header?.startsWith("Bearer ")
+    ? header.slice("Bearer ".length)
+    : "";
 
   if (!token) {
     res.status(401).json({ error: "로그인이 필요합니다." });

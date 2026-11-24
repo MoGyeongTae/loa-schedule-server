@@ -11,5 +11,10 @@
     "rootDir": ".",
     "resolveJsonModule": true
   },
-  "include": ["*.ts"]
+  "include": [
+    "*.ts",
+    "util/auth/create-user.ts",
+    "util/auth/jwt.ts",
+    "util/auth/password.ts"
+  ]
 }
